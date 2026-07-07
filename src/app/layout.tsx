@@ -30,7 +30,7 @@ export default async function RootLayout({
           {user ? (
             <div className="flex h-screen">
               <AppSidebar />
-              <div className="flex-1 overflow-auto">{children}</div>
+              <div className="flex-1 overflow-auto pt-14 pb-16 md:pt-0 md:pb-0">{children}</div>
             </div>
           ) : (
             children
