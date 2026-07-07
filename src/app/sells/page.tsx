@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
-import { AddSellDialog } from "./add-sell-dialog";
+import { SellDialog } from "./sell-dialog";
+import { RowActions } from "./row-actions";
 import {
   Table,
   TableBody,
@@ -18,7 +19,6 @@ export default async function SellsPage() {
     supabase.from("tickers").select("symbol").order("symbol"),
   ]);
 
-  // Compute avg cost per ticker (weighted average from all buys)
   const avgCostByTicker: Record<string, number> = {};
   const totalsByTicker: Record<string, { shares: number; cost: number }> = {};
 
@@ -53,7 +53,7 @@ export default async function SellsPage() {
             Every sale, with fees and realized profit/loss
           </p>
         </div>
-        <AddSellDialog tickers={tickers ?? []} avgCostByTicker={avgCostByTicker} />
+        <SellDialog mode="add" tickers={tickers ?? []} avgCostByTicker={avgCostByTicker} />
       </div>
 
       <div className="mb-6 grid grid-cols-2 gap-4">
@@ -81,6 +81,7 @@ export default async function SellsPage() {
               <TableHead className="text-right">Fees</TableHead>
               <TableHead className="text-right">Avg Cost</TableHead>
               <TableHead className="text-right">Realized P&L</TableHead>
+              <TableHead className="w-12"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -104,12 +105,15 @@ export default async function SellsPage() {
                     <TableCell className={`text-right font-mono font-semibold ${pnl >= 0 ? "text-green-600" : "text-red-600"}`}>
                       {pnl >= 0 ? "+" : ""}${pnl.toFixed(2)}
                     </TableCell>
+                    <TableCell>
+                      <RowActions sell={s} tickers={tickers ?? []} avgCostByTicker={avgCostByTicker} />
+                    </TableCell>
                   </TableRow>
                 );
               })
             ) : (
               <TableRow>
-                <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
+                <TableCell colSpan={9} className="text-center text-muted-foreground py-8">
                   No sells yet. When you sell shares, log them here.
                 </TableCell>
               </TableRow>
