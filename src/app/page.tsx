@@ -1,5 +1,10 @@
 import { createClient } from "@/lib/supabase/server";
-import { buildTickerSummary, computeKpis, formatMoney } from "@/lib/portfolio";
+import {
+  buildTickerSummary,
+  computeKpis,
+  buildNetWorthSeries,
+  formatMoney,
+} from "@/lib/portfolio";
 import {
   Table,
   TableBody,
@@ -13,6 +18,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { ArrowDownToLine, ShoppingCart, TrendingDown, Gift } from "lucide-react";
 import Link from "next/link";
+import { DashboardCharts } from "@/components/dashboard-charts";
 
 export default async function Dashboard() {
   const supabase = await createClient();
@@ -32,32 +38,33 @@ export default async function Dashboard() {
 
   const tickerSummary = buildTickerSummary(buys ?? [], sells ?? []);
   const kpis = computeKpis(deposits ?? [], income ?? [], tickerSummary);
+  const netWorthSeries = buildNetWorthSeries(
+    deposits ?? [],
+    income ?? [],
+    sells ?? [],
+    buys ?? []
+  );
 
-  // Recent activity — union of all 4 tables, sorted by date desc, top 5
   const activity = [
     ...(deposits ?? []).map((d) => ({
-      kind: d.type as string,
       date: d.txn_date,
       label: d.type,
       amount: d.type === "Withdrawal" ? -Number(d.amount) : Number(d.amount),
       icon: ArrowDownToLine,
     })),
     ...(buys ?? []).map((b) => ({
-      kind: "Buy",
       date: b.buy_date,
       label: `Bought ${Number(b.shares).toFixed(4)} ${b.ticker}`,
       amount: -(Number(b.shares) * Number(b.price_per_share)),
       icon: ShoppingCart,
     })),
     ...(sells ?? []).map((s) => ({
-      kind: "Sell",
       date: s.sell_date,
       label: `Sold ${Number(s.shares).toFixed(4)} ${s.ticker}`,
       amount: Number(s.shares) * Number(s.price_per_share) - Number(s.fees),
       icon: TrendingDown,
     })),
     ...(income ?? []).map((i) => ({
-      kind: i.type,
       date: i.received_date,
       label: `${i.type}${i.ticker ? ` (${i.ticker})` : ""}`,
       amount: Number(i.amount),
@@ -117,7 +124,13 @@ export default async function Dashboard() {
         </div>
       </div>
 
-      {/* Holdings table */}
+      {/* Charts */}
+      <DashboardCharts
+        tickerSummary={tickerSummary}
+        netWorthSeries={netWorthSeries}
+      />
+
+      {/* Holdings */}
       <div>
         <h2 className="text-lg font-semibold mb-3">Holdings</h2>
         <div className="rounded-lg border">

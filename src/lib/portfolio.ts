@@ -134,3 +134,60 @@ export function formatMoney(n: number) {
     maximumFractionDigits: 2,
   });
 }
+
+export function buildNetWorthSeries(
+  deposits: Deposit[],
+  income: Income[],
+  sells: Sell[],
+  buys: Buy[]
+): { date: string; cumulative: number }[] {
+  // Precompute avg cost per ticker for realized P&L on sells
+  const totalsByTicker: Record<string, { shares: number; cost: number }> = {};
+  buys.forEach((b) => {
+    if (!totalsByTicker[b.ticker]) totalsByTicker[b.ticker] = { shares: 0, cost: 0 };
+    totalsByTicker[b.ticker].shares += Number(b.shares);
+    totalsByTicker[b.ticker].cost += Number(b.shares) * Number(b.price_per_share);
+  });
+  const avgCostByTicker: Record<string, number> = {};
+  Object.entries(totalsByTicker).forEach(([t, { shares, cost }]) => {
+    avgCostByTicker[t] = shares > 0 ? cost / shares : 0;
+  });
+
+  // Build event stream: each event contributes to net worth
+  type Event = { date: string; delta: number };
+  const events: Event[] = [];
+
+  deposits.forEach((d) => {
+    const sign = d.type === "Deposit" ? 1 : -1;
+    events.push({ date: d.txn_date, delta: sign * Number(d.amount) });
+  });
+
+  income.forEach((i) => {
+    events.push({ date: i.received_date, delta: Number(i.amount) });
+  });
+
+  sells.forEach((s) => {
+    const proceeds = Number(s.shares) * Number(s.price_per_share);
+    const cost = Number(s.shares) * (avgCostByTicker[s.ticker] ?? 0);
+    const pnl = proceeds - Number(s.fees) - cost;
+    events.push({ date: s.sell_date, delta: pnl });
+  });
+
+  events.sort((a, b) => a.date.localeCompare(b.date));
+
+  // Roll into cumulative series (one point per unique date)
+  const series: { date: string; cumulative: number }[] = [];
+  let cumulative = 0;
+  const dateMap = new Map<string, number>();
+
+  events.forEach((e) => {
+    cumulative += e.delta;
+    dateMap.set(e.date, cumulative);
+  });
+
+  Array.from(dateMap.entries())
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .forEach(([date, val]) => series.push({ date, cumulative: val }));
+
+  return series;
+}
