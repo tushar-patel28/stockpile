@@ -3,6 +3,7 @@ import "./globals.css";
 import { createClient } from "@/lib/supabase/server";
 import { AppSidebar } from "@/components/app-sidebar";
 import { Toaster } from "@/components/ui/sonner";
+import { ThemeProvider } from "@/components/theme-provider";
 
 export const metadata: Metadata = {
   title: "Stockpile",
@@ -18,17 +19,24 @@ export default async function RootLayout({
   const { data: { user } } = await supabase.auth.getUser();
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className="antialiased">
-        {user ? (
-          <div className="flex h-screen">
-            <AppSidebar />
-            <div className="flex-1 overflow-auto">{children}</div>
-          </div>
-        ) : (
-          children
-        )}
-        <Toaster />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {user ? (
+            <div className="flex h-screen">
+              <AppSidebar />
+              <div className="flex-1 overflow-auto">{children}</div>
+            </div>
+          ) : (
+            children
+          )}
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );

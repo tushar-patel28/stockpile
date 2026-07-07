@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { ThemeToggle } from "@/components/theme-toggle";
 import {
   LayoutDashboard,
   Activity,
@@ -28,8 +29,9 @@ export function AppSidebar() {
 
   return (
     <aside className="hidden w-56 shrink-0 border-r bg-muted/30 md:block">
-      <div className="flex h-14 items-center gap-2 border-b px-4 font-bold">
-        Stockpile
+      <div className="flex h-14 items-center justify-between gap-2 border-b px-4">
+        <span className="font-bold">Stockpile</span>
+        <ThemeToggle />
       </div>
       <nav className="flex flex-col gap-1 p-2">
         {navItems.map(({ href, label, icon: Icon }) => {
