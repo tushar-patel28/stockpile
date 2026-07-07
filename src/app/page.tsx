@@ -128,6 +128,7 @@ export default async function Dashboard() {
       <DashboardCharts
         tickerSummary={tickerSummary}
         netWorthSeries={netWorthSeries}
+        overallGain={kpis.realizedPnl + kpis.totalIncome}
       />
 
       {/* Holdings */}

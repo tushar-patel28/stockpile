@@ -31,10 +31,10 @@ type NetWorthPoint = {
 type Props = {
   tickerSummary: TickerSummary[];
   netWorthSeries: NetWorthPoint[];
+  overallGain: number;
 };
 
-export function DashboardCharts({ tickerSummary, netWorthSeries }: Props) {
-  // Allocation pie — only holdings with > 0 shares
+export function DashboardCharts({ tickerSummary, netWorthSeries, overallGain }: Props) {  // Allocation pie — only holdings with > 0 shares
   const allocationData = tickerSummary
     .filter((t) => t.totalInvested > 0)
     .map((t) => ({ name: t.ticker, value: t.totalInvested }));
@@ -167,7 +167,7 @@ export function DashboardCharts({ tickerSummary, netWorthSeries }: Props) {
               <Line
                 type="monotone"
                 dataKey="cumulative"
-                stroke="#3b82f6"
+                stroke={overallGain >= 0 ? "#10b981" : "#ef4444"}
                 strokeWidth={2}
                 dot={false}
               />
