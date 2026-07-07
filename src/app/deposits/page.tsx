@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
-import { AddDepositDialog } from "@/app/deposits/add-deposit-dialog";
+import { DepositDialog } from "./deposit-dialog";
+import { RowActions } from "./row-actions";
 import {
   Table,
   TableBody,
@@ -33,7 +34,7 @@ export default async function DepositsPage() {
             Track cash moving in and out of your brokerage
           </p>
         </div>
-        <AddDepositDialog />
+        <DepositDialog mode="add" />
       </div>
 
       <div className="mb-6 grid grid-cols-3 gap-4">
@@ -65,6 +66,7 @@ export default async function DepositsPage() {
               <TableHead>Type</TableHead>
               <TableHead className="text-right">Amount</TableHead>
               <TableHead>Notes</TableHead>
+              <TableHead className="w-12"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -81,11 +83,14 @@ export default async function DepositsPage() {
                     ${Number(d.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </TableCell>
                   <TableCell className="text-muted-foreground">{d.notes || "—"}</TableCell>
+                  <TableCell>
+                    <RowActions deposit={d} />
+                  </TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
+                <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
                   No deposits yet. Add your first one.
                 </TableCell>
               </TableRow>
