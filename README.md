@@ -1,10 +1,8 @@
-# Stockpile 📊
+# Stockpile
 
 A personal stock portfolio tracker that gives you full ownership of your investment data — with a clean dashboard, real-time calculations, and beautiful charts.
 
 **Live demo:** [stockpile-tushar.vercel.app](https://stockpile-tushar.vercel.app/)
-
-![Dashboard screenshot](./docs/dashboard.png)
 
 ---
 
