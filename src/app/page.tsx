@@ -148,7 +148,13 @@ export default async function Dashboard() {
               {tickerSummary.length > 0 ? (
                 tickerSummary.map((t) => (
                   <TableRow key={t.ticker}>
-                    <TableCell className="font-mono font-semibold">{t.ticker}</TableCell>
+                    <TableCell className="font-mono font-semibold">
+                      <Link
+                        href={`/positions/${t.ticker}`}
+                        className="hover:underline hover:text-primary transition-colors">
+                        {t.ticker}
+                      </Link>
+                    </TableCell>
                     <TableCell className="text-right font-mono">
                       {t.sharesHeld.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 6 })}
                     </TableCell>

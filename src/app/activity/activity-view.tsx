@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/table";
 import { formatMoney } from "@/lib/portfolio";
 import { Search } from "lucide-react";
+import Link from "next/link";
 
 type ActivityItem = {
   id: string;
@@ -103,7 +104,18 @@ export function ActivityView({ activity }: { activity: ActivityItem[] }) {
                 <TableRow key={a.id}>
                   <TableCell className="whitespace-nowrap">{a.date}</TableCell>
                   <TableCell>{a.type}</TableCell>
-                  <TableCell className="font-mono">{a.ticker || "—"}</TableCell>
+                  <TableCell className="font-mono">
+                    {a.ticker ? (
+                      <Link
+                        href={`/positions/${a.ticker}`}
+                        className="hover:underline hover:text-primary transition-colors"
+                      >
+                        {a.ticker}
+                      </Link>
+                    ) : (
+                      "—"
+                    )}
+                  </TableCell>
                   <TableCell className="text-muted-foreground">{a.description}</TableCell>
                   <TableCell className={`text-right font-mono font-semibold ${
                     a.amount >= 0 ? "text-green-600" : "text-red-600"
