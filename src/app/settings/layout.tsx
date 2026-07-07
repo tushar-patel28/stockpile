@@ -15,6 +15,7 @@ export default function SettingsLayout({
     { href: "/settings/tickers", label: "Tickers" },
     { href: "/settings/account", label: "Account" },
     { href: "/settings/data", label: "Data" },
+    { href: "/settings/import", label: "Import" },
   ];
 
   return (
