@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
-import { AddBuyDialog } from "@/app/buys/add-buy-dialog";
+import { BuyDialog } from "./buy-dialog";
+import { RowActions } from "./row-actions";
 import {
   Table,
   TableBody,
@@ -31,7 +32,7 @@ export default async function BuysPage() {
             Every stock purchase you&apos;ve made
           </p>
         </div>
-        <AddBuyDialog tickers={tickers ?? []} />
+        <BuyDialog mode="add" tickers={tickers ?? []} />
       </div>
 
       <div className="mb-6 grid grid-cols-2 gap-4">
@@ -57,6 +58,7 @@ export default async function BuysPage() {
               <TableHead className="text-right">Price / Share</TableHead>
               <TableHead className="text-right">Total Cost</TableHead>
               <TableHead>Notes</TableHead>
+              <TableHead className="w-12"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -75,11 +77,14 @@ export default async function BuysPage() {
                     ${(Number(b.shares) * Number(b.price_per_share)).toFixed(2)}
                   </TableCell>
                   <TableCell className="text-muted-foreground">{b.notes || "—"}</TableCell>
+                  <TableCell>
+                    <RowActions buy={b} tickers={tickers ?? []} />
+                  </TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
                   No buys yet. Log your first purchase.
                 </TableCell>
               </TableRow>
