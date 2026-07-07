@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
-import { AddIncomeDialog } from "./add-income-dialog";
+import { IncomeDialog } from "./income-dialog";
+import { RowActions } from "./row-actions";
 import {
   Table,
   TableBody,
@@ -33,7 +34,7 @@ export default async function IncomePage() {
             Dividends, bonuses, referrals, and interest
           </p>
         </div>
-        <AddIncomeDialog tickers={tickers ?? []} />
+        <IncomeDialog mode="add" tickers={tickers ?? []} />
       </div>
 
       <div className="mb-6 grid grid-cols-2 gap-4">
@@ -69,6 +70,7 @@ export default async function IncomePage() {
               <TableHead>Source</TableHead>
               <TableHead className="text-right">Amount</TableHead>
               <TableHead>Notes</TableHead>
+              <TableHead className="w-12"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -82,11 +84,14 @@ export default async function IncomePage() {
                     +${Number(i.amount).toFixed(2)}
                   </TableCell>
                   <TableCell className="text-muted-foreground">{i.notes || "—"}</TableCell>
+                  <TableCell>
+                    <RowActions income={i} tickers={tickers ?? []} />
+                  </TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
+                <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
                   No income yet. Log a dividend or bonus.
                 </TableCell>
               </TableRow>
