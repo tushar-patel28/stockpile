@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { AddTickerDialog } from "@/app/settings/tickers/add-ticker-dialog";
+import { AddTickerDialog } from "./add-ticker-dialog";
 import {
   Table,
   TableBody,
@@ -17,12 +17,12 @@ export default async function TickersPage() {
     .order("symbol");
 
   return (
-    <main className="mx-auto max-w-4xl p-6">
-      <div className="mb-6 flex items-center justify-between">
+    <div>
+      <div className="mb-4 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Tickers</h1>
+          <h2 className="text-lg font-semibold">Tickers</h2>
           <p className="text-sm text-muted-foreground">
-            Manage the stock symbols you track
+            Stock symbols you track
           </p>
         </div>
         <AddTickerDialog />
@@ -49,13 +49,13 @@ export default async function TickersPage() {
             ) : (
               <TableRow>
                 <TableCell colSpan={3} className="text-center text-muted-foreground py-8">
-                  No tickers yet. Add your first one to get started.
+                  No tickers yet. Add your first one.
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
       </div>
-    </main>
+    </div>
   );
 }
