@@ -1,6 +1,6 @@
 # Stockpile
 
-A personal stock portfolio tracker that gives you full ownership of your investment data — with a clean dashboard, real-time calculations, and beautiful charts.
+A personal stock portfolio tracker that gives you full ownership of your investment data — with a clean dashboard, real-time calculations, interactive charts, and full mobile support.
 
 **Live demo:** [stockpile-tushar.vercel.app](https://stockpile-tushar.vercel.app/)
 
@@ -16,15 +16,29 @@ It's also my playground for modern web development — Next.js 16 App Router, Su
 
 ## Features
 
-- 🔐 **Authenticated** — email + password with Supabase Auth, Row-Level Security enforced per-user at the database level
+### Core
+- 🔐 **Authenticated** — email + password via Supabase Auth, Row-Level Security enforced per-user at the database level
 - 💰 **Complete transaction log** — deposits, buys, sells (with fees), and income (dividends + bonuses)
-- 📊 **Real-time dashboard** — KPI cards, per-ticker holdings summary, and charts that update the moment you log anything
+- ✏️ **Full CRUD** — add, edit, and delete every transaction type with inline row actions
+- 📊 **Real-time dashboard** — 5 KPI cards, per-ticker holdings summary, and 3 charts that update instantly
 - 🎯 **Weighted average cost basis** — auto-calculated across multiple buys of the same stock
 - 💵 **Realized P&L tracking** — live-calculated on every sell, factoring in fees
-- 📈 **3 interactive charts** — portfolio allocation pie, realized P&L bar chart, and cumulative net worth line
-- 🔍 **Activity feed** — unified searchable timeline of every transaction
-- 💾 **Data export** — download individual tables as CSV or full JSON backup
-- 📱 **Responsive** — works on mobile, tablet, and desktop
+
+### Visualizations
+- 🥧 **Portfolio allocation pie** — where your money sits by ticker
+- 📊 **Realized P&L bar chart** — profit or loss on closed positions, color-coded
+- 📈 **Net worth over time line** — cumulative deposits + income + realized P&L, colored by overall gain/loss
+
+### Navigation & Data
+- 🔍 **Position detail pages** — click any ticker for a full drilldown: KPIs, all buys, all sells, all income, and a unified timeline
+- 📜 **Activity feed** — unified searchable timeline across every transaction type with filter chips
+- 💾 **CSV import** — bulk-load your entire Excel history in one shot, with per-row validation and preview
+- 📤 **Data export** — download individual tables as CSV or full JSON backup
+
+### Polish
+- 🌗 **Dark mode** — light, dark, or system preference
+- 📱 **Responsive** — desktop sidebar, mobile top bar + bottom tab navigation
+- ⚡ **Loading states** — skeleton loaders on every page for a snappy feel
 - ✨ **Zero manual updates** — every ticker you add appears on the dashboard automatically
 
 ---
@@ -35,6 +49,8 @@ It's also my playground for modern web development — Next.js 16 App Router, Su
 - **Styling:** [Tailwind CSS](https://tailwindcss.com) + [shadcn/ui](https://ui.shadcn.com)
 - **Database & Auth:** [Supabase](https://supabase.com) (Postgres, RLS, Auth)
 - **Charts:** [Recharts](https://recharts.org)
+- **CSV parsing:** [PapaParse](https://www.papaparse.com/)
+- **Theming:** [next-themes](https://github.com/pacocoursey/next-themes)
 - **Icons:** [Lucide](https://lucide.dev)
 - **Hosting:** [Vercel](https://vercel.com)
 
@@ -45,7 +61,8 @@ It's also my playground for modern web development — Next.js 16 App Router, Su
 - **Row-Level Security in the database, not the app.** Postgres policies enforce that a user can only ever read/write their own rows — this means even a bug in the frontend can't leak data.
 - **No stored derived values.** Holdings, realized P&L, and buying power are all computed from raw transactions at query time. Never gets out of sync.
 - **Type-safe end to end.** TypeScript throughout, from Supabase queries to React components.
-- **Dynamic ticker detection.** Add a stock in the Holdings table and it appears across the dashboard automatically — no manual dashboard config.
+- **Dynamic ticker detection.** Add a stock and it appears across the dashboard automatically — no manual dashboard config.
+- **CSV import with validation preview.** Rows are parsed, validated (dates, numbers, required fields), and shown in a table before any DB write. Bad rows are highlighted; only valid rows commit.
 
 ---
 
@@ -66,7 +83,7 @@ It's also my playground for modern web development — Next.js 16 App Router, Su
 
 2. **Set up your Supabase project:**
    - Create a new project at [supabase.com](https://supabase.com)
-   - Copy the SQL from `docs/schema.sql` (see below) into the SQL Editor and run it
+   - Copy the SQL from `docs/schema.sql` into the SQL Editor and run it
    - Grab your Project URL and API keys from Settings → API
 
 3. **Configure environment variables:**
@@ -90,36 +107,42 @@ It's also my playground for modern web development — Next.js 16 App Router, Su
 ```
 src/
 ├── app/
-│   ├── activity/          # Unified transaction feed
-│   ├── buys/              # Purchase logging
-│   ├── deposits/          # Cash movements
-│   ├── income/            # Dividends & bonuses
-│   ├── login/             # Auth page
-│   ├── sells/             # Sale logging with P&L
-│   ├── settings/          # Tickers, Account, Data export
-│   └── page.tsx           # Main dashboard
+│   ├── activity/            # Unified transaction feed
+│   ├── buys/                # Purchase logging (add/edit/delete)
+│   ├── deposits/            # Cash movements (add/edit/delete)
+│   ├── income/              # Dividends & bonuses (add/edit/delete)
+│   ├── login/               # Auth page
+│   ├── positions/[ticker]/  # Per-ticker detail drilldown
+│   ├── sells/               # Sale logging with P&L (add/edit/delete)
+│   ├── settings/            # Tickers, Account, Data export, CSV import
+│   ├── loading.tsx          # Skeleton loader for the dashboard
+│   └── page.tsx             # Main dashboard
 ├── components/
-│   ├── app-sidebar.tsx    # Global navigation
+│   ├── app-sidebar.tsx      # Desktop sidebar + mobile top bar + bottom tab bar
 │   ├── dashboard-charts.tsx
-│   └── ui/                # shadcn/ui components
+│   ├── table-skeleton.tsx   # Reusable skeleton loaders
+│   ├── theme-provider.tsx
+│   ├── theme-toggle.tsx
+│   └── ui/                  # shadcn/ui components
 └── lib/
-    ├── portfolio.ts       # Cost basis + P&L calculations
-    └── supabase/          # Server + client factory
+    ├── portfolio.ts         # Cost basis + P&L calculations
+    └── supabase/            # Server + client factory
 ```
 
 ---
 
 ## Roadmap
 
-- [ ] Position detail page (per-ticker deep dive)
-- [ ] Edit/delete existing transactions
-- [ ] CSV import for bulk historical data
-- [ ] Dark mode toggle
+Nothing planned right now — this is the MVP I use daily. Possible future ideas:
+
 - [ ] Tax report generator (Schedule D-friendly CSV)
 - [ ] Optional live price integration (opt-in)
+- [ ] Historical portfolio value snapshots
+- [ ] Notes/tags on transactions
+- [ ] Keyboard shortcuts (`n` for new, `/` for search)
 
 ---
 
 ## License
 
-MIT © Tushar Patel
+MIT © Tushar Vimalbhai Patel

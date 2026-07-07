@@ -32,7 +32,7 @@ export function TableSkeleton({
             <TableRow key={r}>
               {Array.from({ length: columns }).map((_, c) => (
                 <TableCell key={c}>
-                  <Skeleton className="h-4 w-full max-w-[120px]" />
+                  <Skeleton className="h-4 w-full max-w-30" />
                 </TableCell>
               ))}
             </TableRow>
